@@ -1,11 +1,14 @@
 const { Router } = require('express');
 const booksRepository = require('../data/books-repository');
+const saveFile = require('../middlewares/book-files-middleware');
 const { ErrorResult, Book } = require('../models');
 const { HTTP_STATUS_CODES } = require('../constants');
+const { resolve } = require('path');
 
 const booksRouter = new Router();
 
 const notFoundResult = (res) => res.status(HTTP_STATUS_CODES.NOT_FOUND).json(new ErrorResult('Not found'));
+const getFilePath = (req) => req.file ? req.file.path : null;
 
 booksRouter.get(`/`, (req, res) => {
     const books = booksRepository.getAll();
@@ -21,17 +24,31 @@ booksRouter.get(`/:id`, (req, res) => {
         notFoundResult(res);
     }
 });
+booksRouter.get(`/:id/download`, (req, res) => {
+    const { id } = req.params;
+    const book = booksRepository.getById(id);
+    if (book && book.fileBook) {
+        res.download(resolve(process.cwd(), book.fileBook));
+    } else {
+        notFoundResult(res);
+    }
+});
 
-booksRouter.post(`/`, (req, res) => {
-    const book = new Book(req.body);
+booksRouter.post(`/`, saveFile, (req, res) => {
+    const book = new Book({
+        ...req.body,
+        fileBook: getFilePath(req)
+    });
     booksRepository.addBook(book);
     res.status(HTTP_STATUS_CODES.CREATED).json(book);
 });
 
-booksRouter.put(`/:id`, (req, res) => {
+booksRouter.put(`/:id`, saveFile, (req, res) => {
     const { id } = req.params;
-    const bookData = req.body;
-    const updatedBook = booksRepository.updateBook(id, bookData);
+    const updatedBook = booksRepository.updateBook(id, {
+        ...req.body,
+        fileBook: getFilePath(req)
+    });
     if (updatedBook) {
         res.json(updatedBook);
     } else {

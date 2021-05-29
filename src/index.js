@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const formData = require('express-form-data');
 const { userRoutes, booksRoutes } = require(`./routes`);
 
 const booksRepository = require('./data/books-repository');
@@ -17,9 +16,7 @@ const setInitialData = () => {
 setInitialData();
 
 const app = express();
-app.use(cors())
-app.use(formData.parse());
-
+app.use(cors());
 app.use(`/api/user`, userRoutes);
 app.use(`/api/books`, booksRoutes);
 app.use((req, res) => {

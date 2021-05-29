@@ -1,4 +1,12 @@
 const { Book } = require("../models");
+const fs =  require('fs');
+
+const removeFile = (filePath) => {
+    if (!filePath) return;
+    fs.unlink(filePath, (err) => {
+        if (err) console.error(err);
+    })
+}
 
 class BooksRepository {
     books = [];
@@ -18,6 +26,7 @@ class BooksRepository {
     removeBook(bookId) {
         const bookForDeletingIdx = this.books.findIndex(({ id }) => id === bookId);
         if (bookForDeletingIdx > -1) {
+            removeFile(this.books[bookForDeletingIdx].fileBook);
             this.books.splice(bookForDeletingIdx, 1);
             return true;
         } else {
@@ -28,7 +37,10 @@ class BooksRepository {
     updateBook(bookId, bookDetails) {
         const bookForUpdatingIdx = this.books.findIndex(({ id }) => id === bookId);
         if (bookForUpdatingIdx > -1) {
-            const newBook = new Book({...this.books[bookForUpdatingIdx], ...bookDetails, id: bookId})
+            const newBook = new Book({...this.books[bookForUpdatingIdx], ...bookDetails, id: bookId});
+            if (newBook.fileBook && this.books[bookForUpdatingIdx].fileBook !== newBook.fileBook) {
+                removeFile(this.books[bookForUpdatingIdx].fileBook);
+            }
             this.books[bookForUpdatingIdx] = newBook;
             return newBook;
         } else {
