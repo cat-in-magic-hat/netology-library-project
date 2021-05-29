@@ -1,0 +1,45 @@
+<%- include("../partials/layout-start", {title: title}) %>
+<h1><%= title %></h1>
+
+<a class="btn btn-sm btn-primary" href="/books/create">Добавить книгу</a>
+<% if(books && books.length) { %> 
+    <table class="table table-stripped table-sm mt-3">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Заголовок</th>
+                <th scope="col">Автор</th>
+                <th scope="col">Описание</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% books.map((book, idx) => { %>
+                <tr>
+                    <th scope="row"><%= idx + 1 %></th>
+                    <td><%= book.title %></td>
+                    <td><%= book.authors %></td>
+                    <td><%= book.description %></td>
+                    <td class="text-right">
+                        <a class="btn btn-sm btn-primary" href="/books/<%= book.id %>">
+                            Детали
+                        </a>
+                        <a class="btn btn-sm btn-primary" href="/books/update/<%= book.id %>">
+                            Редактировать
+                        </a>
+                        <form action="/books/delete/<%= book.id %>" method="POST" class="d-inline">
+                            <button class="btn btn-sm btn-danger">
+                                Удалить
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            <% })%>
+        </tbody>
+    </table>
+<% } else {  %>
+     <h3 class="mt-5">Список книг пуст</h3>
+<% } %>
+
+
+<%- include("../partials/layout-end") %>

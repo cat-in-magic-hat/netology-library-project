@@ -1,12 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const { userRoutes, booksRoutes } = require(`./routes`);
+const path = require('path');
+const { userApiRoutes, booksApiRoutes, booksRoutes } = require(`./routes`);
 
 const booksRepository = require('./data/books-repository');
 const { books } = require('./data/fake/initial-data');
-const { HTTP_STATUS_CODES } = require('./constants');
-const { ErrorResult } = require('./models');
-
 const APP_PORT = process.env.PORT || 3000;
 
 const setInitialData = () => {
@@ -17,9 +15,23 @@ setInitialData();
 
 const app = express();
 app.use(cors());
-app.use(`/api/user`, userRoutes);
-app.use(`/api/books`, booksRoutes);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.set('views', path.join(__dirname, './views'))
+app.set('view engine', 'ejs');
+app.get('/', (req, res) => {
+    res.render("index", {
+        title: 'Библиотека'
+    })
+})
+app.use(`/books`, booksRoutes);
+app.use(`/api/books`, booksApiRoutes);
+app.use(`/api/user`, userApiRoutes);
+
 app.use((req, res) => {
-    res.status(HTTP_STATUS_CODES.NOT_FOUND).send(new ErrorResult('Method doesn\'t exist'));
+    res.render("error/404", {
+        title: 'Страница не найдена'
+    })
 });
 app.listen(APP_PORT);
