@@ -3,6 +3,11 @@ const redis = require('redis');
 const STORAGE_URL = process.env.STORAGE_URL || 'localhost';
 const client = redis.createClient(`redis://${STORAGE_URL}`);
 
+client.on('error', error => {
+    console.log('Redis error detected');
+    console.log(error);
+});
+
 const getCounterById = key => new Promise((resolve, reject) => {
     client.get(key, (err, reply) => {
         if (err) reject(err);

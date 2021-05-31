@@ -3,6 +3,7 @@ const booksRepository = require('../data/books-repository');
 const saveFile = require('../middlewares/book-files-middleware');
 const { Book } = require('../models');
 const { HTTP_STATUS_CODES } = require('../constants');
+const { incrementCounter } = require('../services/counters-service');
 
 const booksRouter = new Router();
 const BOOKS_LIST_URL = '/books';
@@ -37,13 +38,21 @@ booksRouter.post('/create', saveFile, (req, res) => {
     redirectToList(res);
 });
 
-booksRouter.get('/:id', (req, res) => {
+booksRouter.get('/:id', async (req, res) => {
     const { id } = req.params;
     const book = booksRepository.getById(id);
     if (book) {
+        let viewsAmount;
+        try {
+            viewsAmount = await incrementCounter(id);
+        } catch(err) {
+            console.error(`Attempt to increment views amount for book '${id}' failed.`);
+            console.error(err);
+        }
         res.render('books/view', {
             title: `Книга '${book.title}'`,
-            book
+            book,
+            viewsAmount
         });
     } else {
         notFoundResult(res);

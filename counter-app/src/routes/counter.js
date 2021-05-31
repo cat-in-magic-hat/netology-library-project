@@ -6,16 +6,13 @@ const counterRouter = new Router();
 
 const logSuccess = (id, amount) => console.info(`Book '${id}' was requested ${amount} times`);
 const logError = (id, err) => console.error(`Attempt to perform operation on book '${id}' failed. Error: '${err}'`);
-
+const sendResult = (response, id, amount) => response.json({ id, amount });
 
 counterRouter.get('/:bookId', async (req, res) => {
     const { bookId } = req.params;
     try {
         const amount = await getCounterById(bookId);
-        res.json({
-            id: bookId,
-            amount 
-        });
+        sendResult(res, bookId, amount);
         logSuccess(bookId, amount);
     } catch (err) {
         logError(bookId, err);
@@ -27,7 +24,7 @@ counterRouter.post('/:bookId/incr', async (req, res) => {
     const { bookId } = req.params;
     try {
         const amount = await incrementCounter(bookId);
-        res.sendStatus(HTTP_STATUS_CODES.ACCEPTED);
+        sendResult(res, bookId, amount);
         logSuccess(bookId, amount);
     } catch (err) {
         logError(bookId, err);

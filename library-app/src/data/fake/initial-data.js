@@ -2,6 +2,7 @@ const { Book } = require("../../models");
 
 const books = [
     new Book({
+        id: '1622503528135285363200314820bf',
         title: 'Волк и семеро козлят',
         description: 'Сказка, обернувшаяся трагедией',
         authors: 'народ',
@@ -9,6 +10,7 @@ const books = [
         fileName: 'Волк и семеро козлят'
     }),
     new Book({
+        id: '16225038646938438615006a4c64c1',
         title: 'Колобок',
         description: 'Любовь, предательство и возмездие',
         authors: 'народ',
