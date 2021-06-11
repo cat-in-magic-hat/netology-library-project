@@ -45,17 +45,25 @@ booksRouter.get('/:id', async (req, res) => {
     try {
         const book = await booksRepository.getBookById(id);
         if (book) {
-            let viewsAmount;
+            let viewsAmount, comments;
             try {
                 viewsAmount = await incrementCounter(id);
             } catch (err) {
                 console.error(`Attempt to increment views amount for book '${id}' failed.`);
                 console.error(err);
             }
+            try {
+                comments = await booksRepository.getComments(id);
+            } catch (err) {
+                console.error(`Attempt to get comments for book '${id}' failed.`);
+                console.error(err);
+            }
             res.render('books/view', {
                 title: `Книга '${book.title}'`,
                 book,
-                viewsAmount
+                viewsAmount,
+                comments,
+                useSocketConnection: true
             });
         } else {
             notFoundResult(res);

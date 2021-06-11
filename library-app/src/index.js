@@ -2,10 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { booksApiRoutes, booksRoutes } = require(`./routes`);
+const { configureSocket } = require('./sockets');
 const booksRepository = require('./data/books-repository');
 const APP_PORT = process.env.PORT || 3000;
 
 const app = express();
+app.use(express.static(path.join(__dirname, './public')));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,16 +27,18 @@ app.use('/500', (req, res) => {
         title: 'Ошибка сервера'
     })
 });
-app.use((req, res) => {
+app.use((req, res) => {    
     res.render("error/general-error", {
         title: 'Страница не найдена'
     })
 });
 
+const server = configureSocket(app);
+
 async function startApp() {
     try {
         await booksRepository.connect();
-        app.listen(APP_PORT)
+        server.listen(APP_PORT)
     } catch (e) {
         console.log(e);
     }

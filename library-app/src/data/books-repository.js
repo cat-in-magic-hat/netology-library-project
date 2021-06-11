@@ -1,4 +1,4 @@
-const { Book } = require("../models");
+const { Book, BookComment } = require("../models");
 const mongoose = require('mongoose');
 const { BOOKS_DB_SETTINGS } = require('../constants');
 
@@ -25,6 +25,23 @@ const updateBook = async (bookId, bookDetails) => {
     return updatedBook != null;
 }
 
+const addComment = async (bookId, comment) => {
+    const book = await Book.findOne({ id: bookId });
+    if (book) {
+        const dbComment = await new BookComment({ ...comment, bookId: book._id }).save();
+        const { _doc: { _id, __v, ...result } } = dbComment;
+        return result;
+    }
+    return null;
+}
+
+const getComments = async (bookId) => {
+    const book = await Book.findOne({ id: bookId });
+    return book
+        ? await BookComment.find({ bookId: book._id }).select(SELECT_FIELDS)
+        : null;
+}
+
 const connect = () => mongoose.connect(BOOKS_DB_SETTINGS.connectionString, { useFindAndModify: false });
 
 module.exports = {
@@ -33,5 +50,7 @@ module.exports = {
     getBookById,
     addBook,
     updateBook,
-    deleteBook
+    deleteBook,
+    addComment,
+    getComments
 };
