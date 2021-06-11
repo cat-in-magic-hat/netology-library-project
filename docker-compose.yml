@@ -1,6 +1,31 @@
 services:
     storage:
         image: redis:latest
+
+    mongodb:
+        image: mongo
+        restart: always
+        ports:
+            - 27017:27017
+        environment: 
+            - USERNAME=${DB_USERNAME}
+            - PASSWORD=${DB_PASSWORD}
+            - MONGO_INITDB_DATABASE=${DB_NAME:-books}
+
+    mongodb-express:
+        image: mongo-express
+        restart: always
+        ports:
+            - 8081:8081
+        environment:
+            - ME_CONFIG_MONGODB_SERVER=mongodb
+            - ME_CONFIG_MONGODB_PORT=27017
+            - ME_CONFIG_MONGODB_AUTH_DATABASE=${DB_NAME:-books}
+            - ME_CONFIG_MONGODB_AUTH_USERNAME=${DB_USERNAME}
+            - ME_CONFIG_MONGODB_AUTH_PASSWORD=${DB_PASSWORD}
+        depends_on:
+            - mongodb
+
     counter:
         build: ./counter-app
         expose:
@@ -12,6 +37,7 @@ services:
             - STORAGE_URL=storage
         depends_on:
             - storage
+
     library:
         build: ./library-app
         ports:
@@ -19,5 +45,10 @@ services:
         environment: 
             - PORT=3000
             - COUNTER_API_URL=http://counter:5000
+            - DB_USERNAME=${DB_USERNAME}
+            - DB_PASSWORD=${DB_PASSWORD}
+            - DB_NAME=${DB_NAME:-books}
+            - DB_HOST=mongodb://mongodb:27017
         depends_on:
             - counter
+            - mongodb

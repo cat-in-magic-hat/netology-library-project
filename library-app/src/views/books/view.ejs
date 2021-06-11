@@ -11,9 +11,6 @@
                 <h5 class="card-title"><%= book.title %></h5>
                 <p class="card-subtitle">Автор: <%= book.authors %></p>                
                 <p class="card-text"><%= book.description %></p>
-                <% if (book.fileBook) { %>
-                <a href="/api/books/<%= book.id %>/download" class="card-link">Скачать книгу</a>
-                <% } %>
                 <% if (viewsAmount) { %>
                     <div><small>Просмотров: <%= viewsAmount %></small></div>
                 <% } %>

@@ -1,7 +1,5 @@
 const { Router } = require('express');
 const booksRepository = require('../data/books-repository');
-const saveFile = require('../middlewares/book-files-middleware');
-const { Book } = require('../models');
 const { HTTP_STATUS_CODES } = require('../constants');
 const { incrementCounter } = require('../services/counters-service');
 
@@ -9,16 +7,20 @@ const booksRouter = new Router();
 const BOOKS_LIST_URL = '/books';
 
 const notFoundResult = (res) => res.status(HTTP_STATUS_CODES.NOT_FOUND).redirect('/404');
-const getFilePath = (req) => req.file ? req.file.path : null;
+const generalErrorResult = (res) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).redirect('/500');
 const redirectToList = (res) => res.redirect(BOOKS_LIST_URL);
 const redirectToItem = (res, id) => res.redirect(`${BOOKS_LIST_URL}/${id}`);
 
-booksRouter.get('/', (req, res) => {
-    const books = booksRepository.getAll();
-    res.render('books/index', {
-        title: 'Библиотека',
-        books
-    });
+booksRouter.get('/', async (req, res) => {
+    try {
+        const books = await booksRepository.getAll();
+        res.render('books/index', {
+            title: 'Библиотека',
+            books
+        });
+    } catch (err) {
+        generalErrorResult(res);
+    }
 });
 
 booksRouter.get('/create', (req, res) => {
@@ -29,69 +31,78 @@ booksRouter.get('/create', (req, res) => {
 });
 
 
-booksRouter.post('/create', saveFile, (req, res) => {
-    const book = new Book({
-        ...req.body,
-        fileBook: getFilePath(req)
-    });
-    booksRepository.addBook(book);
+booksRouter.post('/create', async (req, res) => {
+    try {
+        await booksRepository.addBook({ ...req.body });
+    } catch (err) {
+        console.error(err);
+    }
     redirectToList(res);
 });
 
 booksRouter.get('/:id', async (req, res) => {
     const { id } = req.params;
-    const book = booksRepository.getById(id);
-    if (book) {
-        let viewsAmount;
-        try {
-            viewsAmount = await incrementCounter(id);
-        } catch(err) {
-            console.error(`Attempt to increment views amount for book '${id}' failed.`);
-            console.error(err);
+    try {
+        const book = await booksRepository.getBookById(id);
+        if (book) {
+            let viewsAmount;
+            try {
+                viewsAmount = await incrementCounter(id);
+            } catch (err) {
+                console.error(`Attempt to increment views amount for book '${id}' failed.`);
+                console.error(err);
+            }
+            res.render('books/view', {
+                title: `Книга '${book.title}'`,
+                book,
+                viewsAmount
+            });
+        } else {
+            notFoundResult(res);
         }
-        res.render('books/view', {
-            title: `Книга '${book.title}'`,
-            book,
-            viewsAmount
-        });
-    } else {
-        notFoundResult(res);
+    } catch (err) {
+        generalErrorResult(res);
     }
 });
 
-booksRouter.get('/update/:id', (req, res) => {
+booksRouter.get('/update/:id', async (req, res) => {
     const { id } = req.params;
-    const book = booksRepository.getById(id);
-    if (book) {
-        res.render('books/update', {
-            title: `Книга '${book.title}'`,
-            book
-        });
-    } else {
-        notFoundResult(res);
+    try {
+        const book = await booksRepository.getBookById(id);
+        if (book) {
+            res.render('books/update', {
+                title: `Книга '${book.title}'`,
+                book
+            });
+        } else {
+            notFoundResult(res);
+        }
+    } catch (err) {
+        generalErrorResult(res);
     }
 });
 
-booksRouter.post('/update/:id', saveFile, (req, res) => {
+booksRouter.post('/update/:id', async (req, res) => {
     const { id } = req.params;
-    const updatedBook = booksRepository.updateBook(id, {
-        ...req.body,
-        fileBook: getFilePath(req)
-    });
-    if (updatedBook) {
+    const wasUpdated = await booksRepository.updateBook(id, { ...req.body });
+    if (wasUpdated) {
         redirectToItem(res, id);
     } else {
         notFoundResult(res);
     }
 });
 
-booksRouter.post('/delete/:id', (req, res) => {
+booksRouter.post('/delete/:id', async (req, res) => {
     const { id } = req.params;
-    const wasDeleted = booksRepository.removeBook(id);
-    if (wasDeleted) {
-        redirectToList(res);
-    } else {
-        notFoundResult(res);
+    try {
+        const wasDeleted = await booksRepository.deleteBook(id);
+        if (wasDeleted) {
+            redirectToList(res);
+        } else {
+            notFoundResult(res);
+        }
+    } catch (err) {
+        generalErrorResult(res);
     }
 });
 
