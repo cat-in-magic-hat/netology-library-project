@@ -9,9 +9,10 @@ const getBookById = (bookId) => {
     return Book.findOne({ id: bookId }).select(SELECT_FIELDS);
 }
 
-const addBook = (bookDetails) => {
-    const book = new Book(bookDetails);
-    book.save();
+const addBook = async (bookDetails) => {
+    const created = await new Book(bookDetails).save();
+    const { _id, __v, ...book } = created._doc;
+    return book;
 }
 
 const deleteBook = async (bookId) => {

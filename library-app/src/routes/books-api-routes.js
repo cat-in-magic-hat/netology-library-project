@@ -33,8 +33,8 @@ booksApiRouter.get(`/:id`, async (req, res) => {
 
 booksApiRouter.post(`/`, async (req, res) => {
     try {
-        await booksRepository.addBook({ ...req.body });
-        res.sendStatus(HTTP_STATUS_CODES.CREATED);
+        const book = await booksRepository.addBook({ ...req.body });
+        res.json(book);
     } catch (err) {
         generalErrorResult(res);
     }
@@ -58,7 +58,7 @@ booksApiRouter.delete(`/:id`, async (req, res) => {
     const { id } = req.params;
     try {
         const wasDeleted = await booksRepository.deleteBook(id);
-        if (wasDeleted) res.status(HTTP_STATUS_CODES.NO_CONTENT).send();
+        if (wasDeleted) res.sendStatus(HTTP_STATUS_CODES.OK);
         else notFoundResult(res);
     } catch (err) {
         generalErrorResult(res);
