@@ -1,0 +1,20 @@
+<div class="row">
+    <div class="col-sm-8">
+        <h6>Комментарии</h6>
+        <div id="book-comments">
+            <% comments.forEach(function({ userName, text, created }) { %>
+                <div class="card mb-3">
+                    <div class="card-header"><%= userName %></div>
+                    <div class="card-body">
+                        <p class="card-text"><%= text %></p>
+                    </div>
+                    <div class="card-footer text-muted small">
+                        <%= created.toLocaleDateString('ru') %>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+        <h6>Поделитесь своим мнением</h6>
+        <%- include("./comment-form") %>
+    </div>
+</div>

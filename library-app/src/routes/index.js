@@ -1,7 +1,7 @@
-const userRoutes = require('./user-routes');
+const booksApiRoutes = require('./books-api-routes');
 const booksRoutes = require('./books-routes');
 
 module.exports = {
-    userRoutes,
+    booksApiRoutes,
     booksRoutes
 }
