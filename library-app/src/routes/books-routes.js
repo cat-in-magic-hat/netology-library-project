@@ -1,7 +1,8 @@
 const { Router } = require('express');
-const booksRepository = require('../data/books-repository');
 const { HTTP_STATUS_CODES } = require('../constants');
 const { incrementCounter } = require('../services/counters-service');
+const { container } = require('../configuration/ioc-config');
+const { BooksRepository } = require('../data/books-repository');
 
 const booksRouter = new Router();
 const BOOKS_LIST_URL = '/books';
@@ -11,9 +12,11 @@ const generalErrorResult = (res) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER
 const redirectToList = (res) => res.redirect(BOOKS_LIST_URL);
 const redirectToItem = (res, id) => res.redirect(`${BOOKS_LIST_URL}/${id}`);
 
+const getBooksRepository = () => container.get(BooksRepository);
+
 booksRouter.get('/', async (req, res) => {
     try {
-        const books = await booksRepository.getAll();
+        const books = await getBooksRepository().getAll();
         res.render('books/index', {
             title: 'Библиотека',
             books
@@ -33,7 +36,7 @@ booksRouter.get('/create', (req, res) => {
 
 booksRouter.post('/create', async (req, res) => {
     try {
-        await booksRepository.addBook({ ...req.body });
+        await getBooksRepository().addBook({ ...req.body });
     } catch (err) {
         console.error(err);
     }
@@ -42,6 +45,7 @@ booksRouter.post('/create', async (req, res) => {
 
 booksRouter.get('/:id', async (req, res) => {
     const { id } = req.params;
+    const booksRepository = getBooksRepository();
     try {
         const book = await booksRepository.getBookById(id);
         if (book) {
@@ -76,7 +80,7 @@ booksRouter.get('/:id', async (req, res) => {
 booksRouter.get('/update/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const book = await booksRepository.getBookById(id);
+        const book = await getBooksRepository().getBookById(id);
         if (book) {
             res.render('books/update', {
                 title: `Книга '${book.title}'`,
@@ -92,7 +96,7 @@ booksRouter.get('/update/:id', async (req, res) => {
 
 booksRouter.post('/update/:id', async (req, res) => {
     const { id } = req.params;
-    const wasUpdated = await booksRepository.updateBook(id, { ...req.body });
+    const wasUpdated = await getBooksRepository().updateBook(id, { ...req.body });
     if (wasUpdated) {
         redirectToItem(res, id);
     } else {
@@ -103,7 +107,7 @@ booksRouter.post('/update/:id', async (req, res) => {
 booksRouter.post('/delete/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const wasDeleted = await booksRepository.deleteBook(id);
+        const wasDeleted = await getBooksRepository().deleteBook(id);
         if (wasDeleted) {
             redirectToList(res);
         } else {

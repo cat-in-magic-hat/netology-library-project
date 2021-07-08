@@ -2,8 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { booksApiRoutes, booksRoutes } = require(`./routes`);
+const { container } = require('./configuration/ioc-config');
 const { configureSocket } = require('./sockets');
-const booksRepository = require('./data/books-repository');
+const { BooksRepository } = require('./data/books-repository');
 const APP_PORT = process.env.PORT || 3000;
 
 const app = express();
@@ -34,10 +35,9 @@ app.use((req, res) => {
 });
 
 const server = configureSocket(app);
-
 async function startApp() {
     try {
-        await booksRepository.connect();
+        await container.get(BooksRepository).connect();
         server.listen(APP_PORT)
     } catch (e) {
         console.log(e);

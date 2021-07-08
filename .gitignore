@@ -1,2 +1,5 @@
 **/node_modules
 upload
+library-app/src/data/*.js
+library-app/src/contracts/**/*.js
+library-app/src/configuration/**/*.js
