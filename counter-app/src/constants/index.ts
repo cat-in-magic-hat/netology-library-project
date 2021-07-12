@@ -1,0 +1,9 @@
+export const HTTP_STATUS_CODES = {
+    ACCEPTED: 202,
+    NOT_FOUND: 404,
+    SERVER_ERROR: 500
+}
+
+export const SERVICE_IDENTIFIER = {
+    COUNTER_SERVICE: Symbol.for("COUNTER_SERVICE")
+}

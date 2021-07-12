@@ -4,7 +4,7 @@ ENV PORT=5000
 
 COPY ./package*.json ./
 RUN npm install
-COPY ./src ./
+COPY ./dist ./
 EXPOSE 5000
 
 CMD ["node", "index.js"]
