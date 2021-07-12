@@ -2,13 +2,13 @@ import { injectable } from 'inversify';
 import mongoose from 'mongoose';
 
 import { IBook, IComment } from '../contracts/models';
-import { IBooksRepository } from '../contracts/services';
+import { IBooksRepository, IDbConnector } from '../contracts/services';
 import { Book, BookComment } from '../models';
 import { BOOKS_DB_SETTINGS } from '../constants';
 
 const SELECT_FIELDS = '-__v -_id';
 @injectable()
-export class BooksRepository implements IBooksRepository {
+export class BooksRepository implements IBooksRepository, IDbConnector {
     public async getAll(): Promise<IBook[]> {
         return Book.find().select(SELECT_FIELDS);
     }

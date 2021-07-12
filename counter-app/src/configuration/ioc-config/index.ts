@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Container } from 'inversify';
 import { CounterProvider } from '../../data/counter-provider';
 import { ICounterProvider } from '../../contracts';

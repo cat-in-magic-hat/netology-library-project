@@ -4,8 +4,10 @@ import cors from 'cors';
 import path from 'path';
 import { booksApiRouter, booksRouter } from './routes';
 import { container } from './configuration/ioc-config';
-import { configureSocket } from './sockets';
-import { BooksRepository } from './data/books-repository';
+import { IDbConnector } from './contracts/services';
+import { SERVICE_IDENTIFIER } from './constants';
+import { ISocketConfigurator } from './contracts/services/socket-configurator';
+
 const APP_PORT = process.env.PORT || 3000;
 
 const app = express();
@@ -35,10 +37,10 @@ app.use((req: Request, res: Response) => {
     })
 });
 
-const server = configureSocket(app);
+const server = container.get<ISocketConfigurator>(SERVICE_IDENTIFIER.SOCKET_CONFIGURATOR).configure(app);
 async function startApp() {
     try {
-        await container.get(BooksRepository).connect();
+        await container.get<IDbConnector>(SERVICE_IDENTIFIER.DB_CONNECTOR).connect();
         server.listen(APP_PORT)
     } catch (e) {
         console.log(e);

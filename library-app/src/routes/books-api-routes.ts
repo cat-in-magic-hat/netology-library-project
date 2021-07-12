@@ -1,15 +1,15 @@
 import { Router, Request, Response } from 'express';
 import { ErrorResult } from '../models';
-import { HTTP_STATUS_CODES } from '../constants';
+import { HTTP_STATUS_CODES, SERVICE_IDENTIFIER } from '../constants';
 import { container } from '../configuration/ioc-config';
-import { BooksRepository } from '../data/books-repository';
+import { IBooksRepository } from '../contracts/services';
 
 export const booksApiRouter = Router();
 
 const notFoundResult = (res: Response) => res.status(HTTP_STATUS_CODES.NOT_FOUND).json(new ErrorResult('Not found'));
 const generalErrorResult = (res: Response) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json(new ErrorResult('Internal server error'));
 
-const getBooksRepository = () => container.get(BooksRepository);
+const getBooksRepository = () => container.get<IBooksRepository>(SERVICE_IDENTIFIER.BOOKS_REPOSITORY);
 booksApiRouter.get(`/`, async (req: Request, res: Response) => {
     try {
         const books = await getBooksRepository().getAll();

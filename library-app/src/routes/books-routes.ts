@@ -1,9 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { HTTP_STATUS_CODES } from '../constants';
-import { incrementCounter } from '../services/counters-service';
+import { HTTP_STATUS_CODES, SERVICE_IDENTIFIER } from '../constants';
 import { container } from '../configuration/ioc-config';
-import { BooksRepository } from '../data/books-repository';
 import { IComment } from '../contracts/models';
+import { IBooksRepository, ICounterProvider } from '../contracts/services';
 
 export const booksRouter = Router();
 const BOOKS_LIST_URL = '/books';
@@ -13,7 +12,8 @@ const generalErrorResult = (res: Response) => res.status(HTTP_STATUS_CODES.INTER
 const redirectToList = (res: Response) => res.redirect(BOOKS_LIST_URL);
 const redirectToItem = (res: Response, id: string) => res.redirect(`${BOOKS_LIST_URL}/${id}`);
 
-const getBooksRepository = () => container.get(BooksRepository);
+const getBooksRepository = () => container.get<IBooksRepository>(SERVICE_IDENTIFIER.BOOKS_REPOSITORY);
+const getCounterProvider = () => container.get<ICounterProvider>(SERVICE_IDENTIFIER.COUNTER_PROVIDER);
 
 booksRouter.get('/', async (req: Request, res: Response) => {
     try {
@@ -52,7 +52,7 @@ booksRouter.get('/:id', async (req: Request, res: Response) => {
         if (book) {
             let viewsAmount: number = 0, comments: IComment[] = [];
             try {
-                viewsAmount = await incrementCounter(id);
+                viewsAmount = await getCounterProvider().incrementCounter(id);
             } catch (err) {
                 console.error(`Attempt to increment views amount for book '${id}' failed.`);
                 console.error(err);
