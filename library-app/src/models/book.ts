@@ -1,5 +1,6 @@
-const { Schema, model } = require('mongoose');
-const uidGenerator = require('node-unique-id-generator');
+import mongoose , { Schema, Document, Model } from 'mongoose';
+import uidGenerator from 'node-unique-id-generator';
+import { IBook } from '../contracts/models';
 
 const bookSchema = new Schema({
     id: {
@@ -15,4 +16,4 @@ const bookSchema = new Schema({
     fileName: String
 })
 
-module.exports = model('Book', bookSchema);
+export const Book = mongoose.model<IBook & Document>('Book', bookSchema);

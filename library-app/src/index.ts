@@ -1,11 +1,11 @@
-require("reflect-metadata");
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const { booksApiRoutes, booksRoutes } = require(`./routes`);
-const { container } = require('./configuration/ioc-config');
-const { configureSocket } = require('./sockets');
-const { BooksRepository } = require('./data/books-repository');
+import 'reflect-metadata';
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import path from 'path';
+import { booksApiRouter, booksRouter } from './routes';
+import { container } from './configuration/ioc-config';
+import { configureSocket } from './sockets';
+import { BooksRepository } from './data/books-repository';
 const APP_PORT = process.env.PORT || 3000;
 
 const app = express();
@@ -14,22 +14,22 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.set('views', path.join(__dirname, './views'))
+app.set('views', path.join(__dirname, '../views'))
 app.set('view engine', 'ejs');
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
     res.render("index", {
         title: 'Библиотека'
     })
 })
-app.use(`/books`, booksRoutes);
-app.use(`/api/books`, booksApiRoutes);
+app.use(`/books`, booksRouter);
+app.use(`/api/books`, booksApiRouter);
 
-app.use('/500', (req, res) => {
+app.use('/500', (req: Request, res: Response) => {
     res.render("error/general-error", {
         title: 'Ошибка сервера'
     })
 });
-app.use((req, res) => {    
+app.use((req: Request, res: Response) => {    
     res.render("error/general-error", {
         title: 'Страница не найдена'
     })

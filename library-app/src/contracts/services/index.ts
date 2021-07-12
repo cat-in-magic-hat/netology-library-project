@@ -1,4 +1,4 @@
-import { IBooksRepository } from "./books-repository";
+import { IBooksRepository } from './books-repository';
 
 export {
     IBooksRepository

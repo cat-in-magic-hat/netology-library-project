@@ -1,17 +1,18 @@
 {
-  "include": ["./src/**/*.ts"],
   "compilerOptions": {
-    "target": "es2015",
+    "incremental": true,
+    "target": "es6",
     "module": "commonjs",
     "strict": true,
-    "noImplicitAny": false,
-    "strictNullChecks": false,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     "moduleResolution": "node",
     "types": ["reflect-metadata"],
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   }
 }

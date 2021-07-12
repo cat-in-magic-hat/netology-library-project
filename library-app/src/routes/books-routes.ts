@@ -1,20 +1,21 @@
-const { Router } = require('express');
-const { HTTP_STATUS_CODES } = require('../constants');
-const { incrementCounter } = require('../services/counters-service');
-const { container } = require('../configuration/ioc-config');
-const { BooksRepository } = require('../data/books-repository');
+import { Router, Request, Response } from 'express';
+import { HTTP_STATUS_CODES } from '../constants';
+import { incrementCounter } from '../services/counters-service';
+import { container } from '../configuration/ioc-config';
+import { BooksRepository } from '../data/books-repository';
+import { IComment } from '../contracts/models';
 
-const booksRouter = new Router();
+export const booksRouter = Router();
 const BOOKS_LIST_URL = '/books';
 
-const notFoundResult = (res) => res.status(HTTP_STATUS_CODES.NOT_FOUND).redirect('/404');
-const generalErrorResult = (res) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).redirect('/500');
-const redirectToList = (res) => res.redirect(BOOKS_LIST_URL);
-const redirectToItem = (res, id) => res.redirect(`${BOOKS_LIST_URL}/${id}`);
+const notFoundResult = (res: Response) => res.status(HTTP_STATUS_CODES.NOT_FOUND).redirect('/404');
+const generalErrorResult = (res: Response) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).redirect('/500');
+const redirectToList = (res: Response) => res.redirect(BOOKS_LIST_URL);
+const redirectToItem = (res: Response, id: string) => res.redirect(`${BOOKS_LIST_URL}/${id}`);
 
 const getBooksRepository = () => container.get(BooksRepository);
 
-booksRouter.get('/', async (req, res) => {
+booksRouter.get('/', async (req: Request, res: Response) => {
     try {
         const books = await getBooksRepository().getAll();
         res.render('books/index', {
@@ -26,7 +27,7 @@ booksRouter.get('/', async (req, res) => {
     }
 });
 
-booksRouter.get('/create', (req, res) => {
+booksRouter.get('/create', (req: Request, res: Response) => {
     res.render('books/create', {
         title: 'Добавление книги',
         book: {}
@@ -34,7 +35,7 @@ booksRouter.get('/create', (req, res) => {
 });
 
 
-booksRouter.post('/create', async (req, res) => {
+booksRouter.post('/create', async (req: Request, res: Response) => {
     try {
         await getBooksRepository().addBook({ ...req.body });
     } catch (err) {
@@ -43,13 +44,13 @@ booksRouter.post('/create', async (req, res) => {
     redirectToList(res);
 });
 
-booksRouter.get('/:id', async (req, res) => {
+booksRouter.get('/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
     const booksRepository = getBooksRepository();
     try {
         const book = await booksRepository.getBookById(id);
         if (book) {
-            let viewsAmount, comments;
+            let viewsAmount: number = 0, comments: IComment[] = [];
             try {
                 viewsAmount = await incrementCounter(id);
             } catch (err) {
@@ -77,7 +78,7 @@ booksRouter.get('/:id', async (req, res) => {
     }
 });
 
-booksRouter.get('/update/:id', async (req, res) => {
+booksRouter.get('/update/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const book = await getBooksRepository().getBookById(id);
@@ -94,7 +95,7 @@ booksRouter.get('/update/:id', async (req, res) => {
     }
 });
 
-booksRouter.post('/update/:id', async (req, res) => {
+booksRouter.post('/update/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
     const wasUpdated = await getBooksRepository().updateBook(id, { ...req.body });
     if (wasUpdated) {
@@ -104,7 +105,7 @@ booksRouter.post('/update/:id', async (req, res) => {
     }
 });
 
-booksRouter.post('/delete/:id', async (req, res) => {
+booksRouter.post('/delete/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const wasDeleted = await getBooksRepository().deleteBook(id);
@@ -117,5 +118,3 @@ booksRouter.post('/delete/:id', async (req, res) => {
         generalErrorResult(res);
     }
 });
-
-module.exports = booksRouter;
