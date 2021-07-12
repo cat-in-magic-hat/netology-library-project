@@ -5,7 +5,7 @@ ENV PORT=3000
 COPY ./package*.json ./
 RUN npm install
 COPY ./dist ./
-COPY ./views ./
+COPY ./src/views ./views
 EXPOSE 3000
 
 CMD ["node", "index.js"]

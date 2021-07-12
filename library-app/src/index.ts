@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.set('views', path.join(__dirname, '../views'))
+app.set('views', path.join(__dirname, './views'))
 app.set('view engine', 'ejs');
 app.get('/', (req: Request, res: Response) => {
     res.render("index", {
