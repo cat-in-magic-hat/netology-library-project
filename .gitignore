@@ -2,3 +2,4 @@
 upload
 **/dist
 tsconfig.tsbuildinfo
+tsconfig.build.tsbuildinfo

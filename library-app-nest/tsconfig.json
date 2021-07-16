@@ -1,0 +1,18 @@
+{
+  "include": ["**/*.ts"],
+  "compilerOptions": {
+    "incremental": true,
+    "target": "es6",
+    "module": "commonjs",
+    "strict": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
