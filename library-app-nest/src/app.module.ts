@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
-import { BooksController } from './controllers/books.controller';
-import { BooksService } from './services/books-service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { BOOKS_DB_SETTINGS } from './constants';
+import { BooksModule } from './books.module';
 
 @Module({
-  imports: [],
-  controllers: [BooksController],
-  providers: [BooksService],
+  imports: [
+    MongooseModule.forRoot(BOOKS_DB_SETTINGS.connectionString),
+    BooksModule
+  ]
 })
+
 export class AppModule {}

@@ -1,39 +1,39 @@
 import { Get, Controller, Param, UseInterceptors, Post, Put, Delete, Body, HttpCode, Res, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 import { NotFoundInterceptor } from '../interceptors/not-found-interceptor';
-import { Book } from '../models/book';
-import { BooksService } from '../services/books-service';
+import { BookDto } from '../models/dto';
+import { BooksRepository } from '../repositories/books-repository';
 
 @Controller("books")
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(private readonly booksRepository: BooksRepository) {}
 
   @Get()
-  getAllBooks(): Book[] {
-    return this.booksService.getBooks();
+  async getAllBooks(): Promise<BookDto[]> {
+    return await this.booksRepository.getAll();
   }
 
   @Get(":id")
   @UseInterceptors(NotFoundInterceptor)
-  getBook(@Param('id') id: string): Book | undefined {
-    return this.booksService.getBook(id);
+  async getBook(@Param('id') id: string): Promise<BookDto | null> {
+    return await this.booksRepository.getBookById(id);
   }
 
   @Post()
   @HttpCode(204)
-  createBook(@Body() book: Book): void {
-    this.booksService.createBook(book);
+  async createBook(@Body() book: BookDto): Promise<void> {
+    await this.booksRepository.addBook(book);
   }
 
   @Put(":id")
-  updateBook(@Param('id') id: string, @Body() book: Book, @Res() res: Response): void {
-    const wasUpdated = this.booksService.updateBook(id, book);
+  async updateBook(@Param('id') id: string, @Body() book: BookDto, @Res() res: Response): Promise<void> {
+    const wasUpdated = await this.booksRepository.updateBook(id, book);
     res.status(wasUpdated ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND).send();
   }
 
   @Delete(":id")
-  deleteBook(@Param('id') id: string, @Res() res: Response): void {
-    const wasDeleted = this.booksService.deleteBook(id);
+  async deleteBook(@Param('id') id: string, @Res() res: Response): Promise<void> {
+    const wasDeleted = await this.booksRepository.deleteBook(id);
     res.status(wasDeleted ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND).send();
   }
 }

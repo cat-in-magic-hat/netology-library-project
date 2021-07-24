@@ -9,6 +9,7 @@
     "outDir": "dist",
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "strictPropertyInitialization": false,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "experimentalDecorators": true,

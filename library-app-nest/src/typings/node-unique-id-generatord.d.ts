@@ -1,3 +1,3 @@
 declare module 'node-unique-id-generator' {
-    export const generateUniqueId: () => string;
+  export const generateUniqueId: () => string;
 }
