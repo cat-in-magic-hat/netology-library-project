@@ -3,3 +3,4 @@ upload
 **/dist
 tsconfig.tsbuildinfo
 tsconfig.build.tsbuildinfo
+**/tests/**/coverage/
