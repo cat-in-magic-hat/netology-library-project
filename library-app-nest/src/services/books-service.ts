@@ -1,13 +1,13 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { IBooksRepository } from '../contracts/services';
+import { IBooksService } from '../contracts/services';
 import { BookDocument, Book } from '../models/db';
 import { BookDto } from '../models/dto';
 import { Injectable } from '@nestjs/common';
 
 const SELECT_FIELDS = '-__v -_id';
 @Injectable()
-export class BooksRepository implements IBooksRepository {
+export class BooksService implements IBooksService {
     constructor(
         @InjectModel(Book.name) private bookModel: Model<BookDocument>
     ){}

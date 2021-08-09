@@ -1,7 +1,7 @@
 import { BookDocument } from '../../models/db';
 import { BookDto } from '../../models/dto';
 
-export interface IBooksRepository {
+export interface IBooksService {
     getAll: () => Promise<BookDocument[]>;
     getBookById: (bookId: string) => Promise<BookDocument | null>;
     addBook: (bookDetails: BookDto) => Promise<BookDocument>; 
