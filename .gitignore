@@ -3,3 +3,4 @@ upload
 **/dist
 tsconfig.tsbuildinfo
 tsconfig.build.tsbuildinfo
+**/path/to/serviceAccountKey.json

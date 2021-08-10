@@ -2,7 +2,7 @@ import { Get, Controller, Param, UseInterceptors, Post, Put, Delete, Body, HttpC
 import { Response } from 'express';
 import { NotFoundInterceptor } from '../interceptors/not-found-interceptor';
 import { BookDto } from '../models/dto';
-import { BooksRepository } from '../repositories/books-repository';
+import { BooksRepository } from '../services/books-service';
 
 @Controller("books")
 export class BooksController {
@@ -10,7 +10,7 @@ export class BooksController {
 
   @Get()
   async getAllBooks(): Promise<BookDto[]> {
-    return await this.booksRepository.getAll();
+    return await this.booksRepository.getAll() || [];
   }
 
   @Get(":id")
@@ -20,9 +20,8 @@ export class BooksController {
   }
 
   @Post()
-  @HttpCode(204)
-  async createBook(@Body() book: BookDto): Promise<void> {
-    await this.booksRepository.addBook(book);
+  async createBook(@Body() book: BookDto): Promise<BookDto> {
+    return await this.booksRepository.addBook(book);
   }
 
   @Put(":id")
@@ -32,8 +31,7 @@ export class BooksController {
   }
 
   @Delete(":id")
-  async deleteBook(@Param('id') id: string, @Res() res: Response): Promise<void> {
-    const wasDeleted = await this.booksRepository.deleteBook(id);
-    res.status(wasDeleted ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND).send();
+  async deleteBook(@Param('id') id: string): Promise<void> {
+    await this.booksRepository.deleteBook(id);
   }
 }

@@ -1,1 +1,2 @@
-export * from './books-repository';
+export * from './books-service';
+export * from './books-comments-service';
